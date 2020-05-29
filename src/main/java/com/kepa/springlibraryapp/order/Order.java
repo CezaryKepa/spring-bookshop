@@ -2,8 +2,11 @@ package com.kepa.springlibraryapp.order;
 
 import com.kepa.springlibraryapp.book.Book;
 import com.kepa.springlibraryapp.user.User;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +24,12 @@ public class Order {
             inverseJoinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id")
     )
     private List<Book> books = new ArrayList<>();
+//    @NotEmpty
     private String address;
+    //todo:validation
+//    @NotEmpty
+//    @Pattern(regexp="^(?:\\+\\d{1,3}|0\\d{1,3}|00\\d{1,2})?(?:\\s?\\(\\d+\\))?(?:[-\\/\\s.]|\\d)+$")
+//    @Length(min = 9, max = 13)
     private String telephone;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

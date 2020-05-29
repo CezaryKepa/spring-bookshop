@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,10 +45,16 @@ public class UserController {
     public String addUser(@ModelAttribute @Valid User user,
                           BindingResult bindResult) {
 
-        if (bindResult.hasErrors())
+        if (bindResult.hasErrors()) {
             return "registerForm";
+        }
         else {
-            userService.addWithDefaultRole(user);
+            try {
+                userService.addWithDefaultRole(user);
+            }catch(DuplicateException e){
+                bindResult.rejectValue("email", "error.user", "An account already exists for this email.");
+                return "registerForm";
+            }
             return "registerSuccess";
         }
     }

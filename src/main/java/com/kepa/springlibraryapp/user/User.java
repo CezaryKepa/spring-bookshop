@@ -3,8 +3,10 @@ package com.kepa.springlibraryapp.user;
 
 
 import com.kepa.springlibraryapp.order.Order;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 
@@ -13,11 +15,17 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Length(min = 3, max = 20)
+    @NotEmpty
     private String firstname;
+    @Length(min = 3, max = 30)
+    @NotEmpty
     private String lastname;
-    @Column(unique = true)
+    @Email
+    @Column(unique = true, nullable = false)
     @NotEmpty
     private String email;
+    @Length(min = 6)//, max = 25 cause data.sql
     @NotEmpty
     private String password;
     @OneToMany(mappedBy = "user")

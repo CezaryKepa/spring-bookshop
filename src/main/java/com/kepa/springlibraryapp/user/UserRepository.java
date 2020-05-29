@@ -11,7 +11,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
     User findByEmail(String email);
-
+    @Query("select a from User a where a.email=:email")
+    Optional<User> findByEmailOpt(String email);
     @Query("select a from User a where lower(a.firstname) like lower(concat('%', :search, '%')) " +
             "or lower(a.lastname) like lower(concat('%', :search, '%'))")
     List<User> findAllByNameOrLastName(@Param("search") String search);

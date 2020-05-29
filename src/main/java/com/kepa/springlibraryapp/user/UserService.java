@@ -40,6 +40,11 @@ public class UserService {
     }
 
     public void addWithDefaultRole(User user) {
+        Optional<User> userFind = userRepository.findByEmailOpt(user.getEmail());
+
+        if(userFind.isPresent())
+            throw new DuplicateException();
+
         UserRole defaultRole = roleRepository.findByRole(DEFAULT_ROLE);
         user.getRoles().add(defaultRole);
         String passwordHash = passwordEncoder.encode(user.getPassword());

@@ -58,7 +58,7 @@ public class OrderController {
         return "order";
     }
     @PostMapping("/order-finalize")
-    public String proceedOrder(@RequestParam String address, @RequestParam String telephone, Model model, Authentication authentication) {
+    public String proceedOrder(@RequestParam String address, @RequestParam  String telephone, Model model, Authentication authentication) {
         String email = null;
         if (authentication != null) {
             email=authentication.getName();
