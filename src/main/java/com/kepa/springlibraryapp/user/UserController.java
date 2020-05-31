@@ -1,14 +1,13 @@
 package com.kepa.springlibraryapp.user;
 
 
-import com.kepa.springlibraryapp.book.BookDto;
+import com.kepa.springlibraryapp.verification.Token;
+import com.kepa.springlibraryapp.verification.TokenNotFoundException;
+import com.kepa.springlibraryapp.verification.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -18,10 +17,12 @@ import java.util.Optional;
 @Controller
 public class UserController {
     private UserService userService;
+    private TokenRepository tokenRepository;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService,TokenRepository tokenRepository) {
         this.userService = userService;
+        this.tokenRepository = tokenRepository;
     }
 
     @GetMapping("/users")
@@ -44,19 +45,26 @@ public class UserController {
     @PostMapping("/register")
     public String addUser(@ModelAttribute @Valid User user,
                           BindingResult bindResult) {
+        if (bindResult.hasErrors())
+            return "registerForm";
 
-        if (bindResult.hasErrors()) {
+        try {
+            userService.addWithDefaultRole(user);
+        } catch (DuplicateException e) {
+            bindResult.rejectValue("email", "error.user", "An account already exists for this email.");
             return "registerForm";
         }
-        else {
-            try {
-                userService.addWithDefaultRole(user);
-            }catch(DuplicateException e){
-                bindResult.rejectValue("email", "error.user", "An account already exists for this email.");
-                return "registerForm";
-            }
-            return "registerSuccess";
-        }
+        return "registerSuccess";
+    }
+
+    @GetMapping("/token")
+    public String singup(@RequestParam String value) {
+        Optional<Token> token = tokenRepository.findByValue(value);
+        Token byValue = token.orElseThrow(TokenNotFoundException::new);
+        User appUser = byValue.getAppUser();
+        appUser.setEnabled(true);
+        userService.save(appUser);
+        return "activationSuccess";
     }
 
     @GetMapping("{userId}/delete")
@@ -79,7 +87,7 @@ public class UserController {
     public String updateUser(@ModelAttribute @Valid User user, @RequestParam Long userId, Model model) {
         List<UserDto> users = userService.findAll();
         model.addAttribute("users", users);
-        userService.update(user,userId);
+        userService.update(user, userId);
         return "redirect:/users";
     }
 }

@@ -29,15 +29,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(username);
         if(user == null)
             throw new UsernameNotFoundException("User not found");
-        org.springframework.security.core.userdetails.User userDetails =
-                new org.springframework.security.core.userdetails.User(
-                        user.getEmail(),
-                        user.getPassword(),
-                        convertAuthorities(user.getRoles()));
-        return userDetails;
+        return user;
     }
 
-    private Set<GrantedAuthority> convertAuthorities(Set<UserRole> userRoles) {
+    public Set<GrantedAuthority> convertAuthorities(Set<UserRole> userRoles) {
         Set<GrantedAuthority> authorities = new HashSet<>();
         for(UserRole ur: userRoles) {
             authorities.add(new SimpleGrantedAuthority(ur.getRole()));

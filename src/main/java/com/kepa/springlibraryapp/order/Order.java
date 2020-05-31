@@ -81,4 +81,17 @@ public class Order {
     public void setStatus(OrderStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Order{");
+        sb.append("id=").append(id);
+        sb.append(", user=").append(user);
+        sb.append(", books=").append(books);
+        sb.append(", address='").append(address).append('\'');
+        sb.append(", telephone='").append(telephone).append('\'');
+        sb.append(", status=").append(status);
+        sb.append('}');
+        return sb.toString();
+    }
 }
