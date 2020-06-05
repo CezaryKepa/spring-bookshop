@@ -38,7 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/order-add").authenticated()
                 .antMatchers("/{id}/delete").authenticated()
                 .antMatchers("/user-edit").authenticated()
-
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
@@ -46,6 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutSuccessUrl("/")
+                .and()
+                .oauth2Login()
                 .and()
                 .csrf()
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
