@@ -41,7 +41,7 @@ public class UserController {
         model.addAttribute("user", new User());
         return "registerForm";
     }
-
+    
     @PostMapping("/register")
     public String addUser(@ModelAttribute @Valid User user,
                           BindingResult bindResult) {
