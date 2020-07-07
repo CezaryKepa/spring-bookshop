@@ -87,14 +87,16 @@
         <div class="text-right">
             <h5 th:text="|Do zapłaty: ${#numbers.formatDecimal(sum,1,2,'COMMA')}zł|">Do zapłaty: 99.99zł</h5>
         </div>
-        <form action="#" th:action="@{/order-finalize}" method="post">
+        <form action="#" th:action="@{/order-finalize}" method="post" th:object="${orderDetails}">
             <div class="form-group">
                 <label for="addressInput">Adres</label>
-                <input type="text" class="form-control" id="addressInput" name="address" placeholder="ul. Krzycka 28, 50-230 Wrocław">
+                <input type="text" class="form-control" id="addressInput" name="address" th:field="*{address}" placeholder="ul. Krzycka 28, 50-230 Wrocław" required>
+                <span class="input-group-addon" aria-hidden="true" th:errors="*{address}"></span>
             </div>
             <div class="form-group">
                 <label for="telephoneInput">Telefon</label>
-                <input type="text" class="form-control" id="telephoneInput" name="telephone" placeholder="888-999-777">
+                <input type="text" class="form-control" id="telephoneInput" name="telephone"  th:field="*{telephone}" placeholder="888-999-777" required>
+                <span class="input-group-addon" aria-hidden="true" th:errors="*{telephone}"></span>
             </div>
             <div class="text-center">
                 <button class="btn btn-primary">Zamów</button>

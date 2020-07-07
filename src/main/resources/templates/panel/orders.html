@@ -88,8 +88,8 @@
                 <tbody th:remove="all-but-first">
                 <tr th:each="order: ${orders}">
                     <th scope="row" th:text="${order.id}">1</th>
-                    <td th:text="${order.address}">ul. Krakowska 43/22, 53-320 Wrocław</td>
-                    <td th:text="${order.telephone}">888-777-666</td>
+                    <td th:text="${order.orderDetails.address}">ul. Krakowska 43/22, 53-320 Wrocław</td>
+                    <td th:text="${order.orderDetails.telephone}">888-777-666</td>
                     <td th:text="${order.user.getEmail()}">888-777-666</td>
                     <th:block th:switch="${order.status}">
                         <td th:case="${T(com.kepa.springlibraryapp.order.OrderStatus).NEW}">Nowe</td>

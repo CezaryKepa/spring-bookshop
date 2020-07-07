@@ -13,29 +13,36 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
+import javax.validation.Valid;
 import java.util.*;
 
 @Controller
+@Transactional
 public class OrderController {
     private ClientOrder clientOrder;
     private BookRepository bookRepository;
     private OrderRepository orderRepository;
     private UserRepository userRepository;
     private UserService userService;
+    private OrderDetailsRepository orderDetailsRepository;
 
     @Autowired
-    public OrderController(ClientOrder clientOrder, BookRepository bookRepository, OrderRepository orderRepository, UserRepository userRepository, UserService userService) {
+    public OrderController(ClientOrder clientOrder, BookRepository bookRepository, OrderRepository orderRepository, UserRepository userRepository, UserService userService, OrderDetailsRepository orderDetailsRepository) {
         this.clientOrder = clientOrder;
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.orderDetailsRepository = orderDetailsRepository;
     }
 
     @GetMapping("/order-add")
@@ -55,37 +62,50 @@ public class OrderController {
     }
 
     @GetMapping("/order")
-    public String getCurrentOrder(Model model) {
+    public String getCurrentOrder(Model model ) {
         model.addAttribute("order", clientOrder.getOrder());
         model.addAttribute("sum", clientOrder
                 .getOrder()
                 .getBooks().stream()
                 .mapToDouble(Book::getPrice)
                 .sum());
+        model.addAttribute("orderDetails", new OrderDetails());
         return "order";
     }
 
     @PostMapping("/order-finalize")
-    public String proceedOrder(@RequestParam String address, @RequestParam String telephone, Model model, Authentication authentication) {
+    public String proceedOrder(Model model, @Valid OrderDetails orderDetails, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasErrors()){
+            model.addAttribute("order", clientOrder.getOrder());
+            model.addAttribute("sum", clientOrder
+                    .getOrder()
+                    .getBooks().stream()
+                    .mapToDouble(Book::getPrice)
+                    .sum());
+            return "order";
+        }
+
         String email = null;
 
         if (authentication != null)
             email = authentication.getName();
 
         Optional<User> user = userRepository.findByEmailOpt(email);
+        Optional<User> userGithub = userRepository.findByEmailOpt(email+"@github.com");
+
+        orderDetailsRepository.save(orderDetails);
 
         Order order = clientOrder.getOrder();
-        order.setAddress(address);
-        order.setTelephone(telephone);
-
-        if (!user.isPresent()) {
-            User newUser = OAuth2UserToUser(authentication, order, email);
-            order.setUser(newUser);
-        } else
-            order.setUser(user.get());
+        order.setOrderDetails(orderDetails);
+        user.ifPresent(order::setUser);
+        userGithub.ifPresent(order::setUser);
+        if(!user.isPresent() && !userGithub.isPresent())
+        order.setUser(OAuth2UserToUser(authentication,order, email));
 
         orderRepository.save(order);
         clientOrder.clear();
+
         model.addAttribute("message", new Message("Dziękujemy", "Zamówienie przekazane do realizacji"));
         return "message";
     }

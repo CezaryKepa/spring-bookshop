@@ -24,13 +24,8 @@ public class Order {
             inverseJoinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id")
     )
     private List<Book> books = new ArrayList<>();
-//    @NotEmpty
-    private String address;
-    //todo:validation
-//    @NotEmpty
-//    @Pattern(regexp="^(?:\\+\\d{1,3}|0\\d{1,3}|00\\d{1,2})?(?:\\s?\\(\\d+\\))?(?:[-\\/\\s.]|\\d)+$")
-//    @Length(min = 9, max = 13)
-    private String telephone;
+    @OneToOne
+    private OrderDetails orderDetails;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
@@ -58,20 +53,12 @@ public class Order {
         this.books = books;
     }
 
-    public String getAddress() {
-        return address;
+    public OrderDetails getOrderDetails() {
+        return orderDetails;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setOrderDetails(OrderDetails orderDetails) {
+        this.orderDetails = orderDetails;
     }
 
     public OrderStatus getStatus() {
@@ -88,8 +75,7 @@ public class Order {
         sb.append("id=").append(id);
         sb.append(", user=").append(user);
         sb.append(", books=").append(books);
-        sb.append(", address='").append(address).append('\'');
-        sb.append(", telephone='").append(telephone).append('\'');
+        sb.append(", orderDetails=").append(orderDetails);
         sb.append(", status=").append(status);
         sb.append('}');
         return sb.toString();

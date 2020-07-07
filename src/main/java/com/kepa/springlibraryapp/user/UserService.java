@@ -9,6 +9,7 @@ import com.kepa.springlibraryapp.verification.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService {
     private static final String DEFAULT_ROLE = "ROLE_USER";
     private static final String APP_URL = "http://51.68.142.7:8080/";
