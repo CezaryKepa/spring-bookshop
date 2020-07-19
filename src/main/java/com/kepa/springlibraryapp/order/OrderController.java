@@ -50,25 +50,19 @@ public class OrderController {
         Optional<Book> book = bookRepository.findById(bookId);
 
         book.ifPresent(clientOrder::add);
-        if (book.isPresent()) {
-            int stock = book.get().getStock();
-            book.get().setStock(stock - 1);
-            bookRepository.save(book.get());
+
+        if (book.isPresent())
             model.addAttribute("message", new Message("Dodano", "Do zamówienia dodano: " + book.get().getName()));
-        } else {
+        else
             model.addAttribute("message", new Message("Nie dodano", "Porano błędne id z menu: " + bookId));
-        }
+
         return "message";
     }
 
     @GetMapping("/order")
-    public String getCurrentOrder(Model model ) {
+    public String getCurrentOrder(Model model) {
         model.addAttribute("order", clientOrder.getOrder());
-        model.addAttribute("sum", clientOrder
-                .getOrder()
-                .getBooks().stream()
-                .mapToDouble(Book::getPrice)
-                .sum());
+        model.addAttribute("sum", sumOrderCost());
         model.addAttribute("orderDetails", new OrderDetails());
         return "order";
     }
@@ -76,38 +70,52 @@ public class OrderController {
     @PostMapping("/order-finalize")
     public String proceedOrder(Model model, @Valid OrderDetails orderDetails, BindingResult bindingResult, Authentication authentication) {
 
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("order", clientOrder.getOrder());
-            model.addAttribute("sum", clientOrder
-                    .getOrder()
-                    .getBooks().stream()
-                    .mapToDouble(Book::getPrice)
-                    .sum());
+            model.addAttribute("sum", sumOrderCost());
             return "order";
         }
 
         String email = null;
-
         if (authentication != null)
             email = authentication.getName();
 
         Optional<User> user = userRepository.findByEmailOpt(email);
-        Optional<User> userGithub = userRepository.findByEmailOpt(email+"@github.com");
+        Optional<User> userGithub = userRepository.findByEmailOpt(email + "@github.com");
 
         orderDetailsRepository.save(orderDetails);
 
         Order order = clientOrder.getOrder();
         order.setOrderDetails(orderDetails);
+
         user.ifPresent(order::setUser);
         userGithub.ifPresent(order::setUser);
-        if(!user.isPresent() && !userGithub.isPresent())
-        order.setUser(OAuth2UserToUser(authentication,order, email));
+        if (!user.isPresent() && !userGithub.isPresent())
+            order.setUser(OAuth2UserToUser(authentication, order, email));
+
+        updateStock(order.getBooks());
 
         orderRepository.save(order);
         clientOrder.clear();
 
         model.addAttribute("message", new Message("Dziękujemy", "Zamówienie przekazane do realizacji"));
         return "message";
+    }
+
+    private double sumOrderCost(){
+        return clientOrder
+                .getOrder()
+                .getBooks().stream()
+                .mapToDouble(Book::getPrice)
+                .sum();
+    }
+
+    private void updateStock(List<Book> books) {
+        books.forEach(book -> {
+            int stock = book.getStock();
+            book.setStock(stock - 1);
+            bookRepository.save(book);
+        });
     }
 
     private User OAuth2UserToUser(Authentication authentication, Order order, String email) {

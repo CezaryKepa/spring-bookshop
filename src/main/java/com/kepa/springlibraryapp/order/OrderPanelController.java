@@ -51,7 +51,11 @@ public class OrderPanelController {
 
     private String singleOrderPanel(Order order, Model model) {
         model.addAttribute("order", order);
-        model.addAttribute("sum", order.getBooks().stream().mapToDouble(Book::getPrice).sum());
+        model.addAttribute("sum", order
+                .getBooks()
+                .stream()
+                .mapToDouble(Book::getPrice)
+                .sum());
         return "panel/order";
     }
 
