@@ -73,6 +73,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Nazwa</th>
                 <th scope="col">Cena</th>
+                <th scope="col">Usuń</th>
             </tr>
             </thead>
             <tbody th:remove="all-but-first">
@@ -80,6 +81,11 @@
                 <th scope="row" th:text="${idx.index+1}"></th>
                 <td th:text="${book.name}"></td>
                 <td th:text="|${book.price}zł|"></td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-danger" title="Usuń" th:href="@{/order-delete(bookIndex=${idx.index})}">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                </td>
             </tr>
 
             </tbody>

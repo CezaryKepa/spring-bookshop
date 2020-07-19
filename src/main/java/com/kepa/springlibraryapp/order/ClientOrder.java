@@ -18,9 +18,12 @@ public class ClientOrder {
         return order;
     }
 
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
     void add(Book book) {
         order.getBooks().add(book);
-
     }
 
     void clear() {

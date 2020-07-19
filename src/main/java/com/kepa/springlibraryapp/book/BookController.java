@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -23,5 +24,17 @@ public class BookController {
         Optional<BookDto> book= bookService.findById(bookId);
         model.addAttribute("book", book.get());
         return "book";
+    }
+
+    @GetMapping("/")
+    public String findAll(Model model,@RequestParam(value = "text",required = false) String text) {
+        List<BookDto> books;
+        if (text != null)
+            books = bookService.findAllByNameOrAuthor(text);
+        else
+            books = bookService.findAll();
+
+        model.addAttribute("books", books);
+        return "index";
     }
 }
