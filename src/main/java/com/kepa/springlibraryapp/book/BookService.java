@@ -25,8 +25,9 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<BookDto> findById(Long id) {
-        return bookRepository.findById(id).map(BookMapper::toDto);
+    public BookDto findById(Long id) {
+        Optional<BookDto> bookDto = bookRepository.findById(id).map(BookMapper::toDto);
+        return bookDto.orElseThrow(BookNotFoundException::new);
     }
 
     public List<BookDto> findAllByNameOrAuthor(String text) {

@@ -20,9 +20,8 @@ public class BookController {
 
     @GetMapping("/book")
     public String book(@RequestParam Long bookId, Model model) {
-        System.out.println(bookId);
-        Optional<BookDto> book= bookService.findById(bookId);
-        model.addAttribute("book", book.get());
+        BookDto book= bookService.findById(bookId);
+        model.addAttribute("book", book);
         return "book";
     }
 

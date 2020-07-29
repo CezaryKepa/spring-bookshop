@@ -77,9 +77,8 @@ public class UserController {
 
     @GetMapping("/user-edit")
     public String getUser(@RequestParam Long userId, Model model) {
-        System.out.println(userId);
-        Optional<UserDto> user = userService.findById(userId);
-        model.addAttribute("userModel", user.get());
+        UserDto user = userService.findById(userId);
+        model.addAttribute("userModel", user);
         return "panel/user-edit";
     }
 

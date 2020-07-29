@@ -29,16 +29,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username);
-        if(user == null)
+        if (user == null)
             throw new UsernameNotFoundException("User not found");
         return user;
     }
 
     public Set<GrantedAuthority> convertAuthorities(Set<UserRole> userRoles) {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        for(UserRole ur: userRoles) {
-            authorities.add(new SimpleGrantedAuthority(ur.getRole()));
-        }
+        userRoles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getRole())));
         return authorities;
     }
 }

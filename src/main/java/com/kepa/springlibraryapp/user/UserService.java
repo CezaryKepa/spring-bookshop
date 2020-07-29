@@ -97,8 +97,9 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<UserDto> findById(Long id) {
-        return userRepository.findById(id).map(UserMapper::toDto);
+    public UserDto findById(Long id) {
+        Optional<UserDto> userDto = userRepository.findById(id).map(UserMapper::toDto);
+        return userDto.orElseThrow(UserNotFoundException::new);
     }
 
     public List<UserDto> findAllByNameOrAuthor(String text) {
@@ -113,17 +114,19 @@ public class UserService {
     }
 
     void delete(Long userId) {
-        System.out.println(userId);
         Optional<User> user = userRepository.findById(userId);
+
         User userEntity = user.orElseThrow(UserNotFoundException::new);
+
         List<Order> orders = userEntity.getOrders();
+
         if (!orders.isEmpty()) {
             orders.forEach(order -> {
                 orderRepository.deleteById(order.getId());
             });
         }
-        userRepository.deleteById(userId);
 
+        userRepository.deleteById(userId);
     }
 
     void update(User user, Long userId) {
