@@ -22,7 +22,7 @@ public class BookController {
     public String book(@RequestParam Long bookId, Model model) {
         BookDto book= bookService.findById(bookId);
         model.addAttribute("book", book);
-        return "book";
+        return "bookView";
     }
 
     @GetMapping("/")
