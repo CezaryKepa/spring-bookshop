@@ -1,23 +1,16 @@
 package com.kepa.springlibraryapp.order;
 
 import com.kepa.springlibraryapp.book.Book;
-import com.kepa.springlibraryapp.book.BookRepository;
 import com.kepa.springlibraryapp.common.Message;
-import com.kepa.springlibraryapp.user.User;
-import com.kepa.springlibraryapp.user.UserRepository;
 
-import com.kepa.springlibraryapp.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -57,7 +50,7 @@ public class OrderController {
         model.addAttribute("sum", orderService.sumOrderCost());
         model.addAttribute("orderDetails", new OrderDetails());
 
-        return "order";
+        return "orderView";
     }
 
     @GetMapping("/order")
@@ -65,7 +58,7 @@ public class OrderController {
         model.addAttribute("order", clientOrder.getOrder());
         model.addAttribute("sum", orderService.sumOrderCost());
         model.addAttribute("orderDetails", new OrderDetails());
-        return "order";
+        return "orderView";
     }
 
     @PostMapping("/order-finalize")
@@ -74,7 +67,7 @@ public class OrderController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("order", clientOrder.getOrder());
             model.addAttribute("sum", orderService.sumOrderCost());
-            return "order";
+            return "orderView";
         }
 
         orderService.proceedOrder(orderDetails, authentication);

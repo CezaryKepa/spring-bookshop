@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -27,6 +28,9 @@ class OrderControllerTest {
 
     @Mock
     OrderService orderService;
+
+    @Mock
+    ClientOrder clientOrder;
 
     @Mock
     Model model;
@@ -82,11 +86,47 @@ class OrderControllerTest {
     }
 
     @Test
-    void deleteBookFromOrder() {
+    void deleteBookFromOrderTest() {
+        //given
+        Long bookId=1L;
+
+        //when
+        String view = controller.deleteBookFromOrder(bookId,model);
+
+        //then
+        then(orderService).should().deleteBookFromOrder(bookId);
+        then(model).should(times(3)).addAttribute(anyString(), any());
+        assertThat("orderView").isEqualToIgnoringCase(view);
     }
 
     @Test
-    void getCurrentOrder() {
+    void deleteBookFromOrderControllerTest() throws Exception {
+        mockMvc.perform((get("/order-delete")).param("bookIndex","1"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("order"))
+                .andExpect(model().attributeExists("sum"))
+                .andExpect(model().attributeExists("orderDetails"))
+                .andExpect(view().name("orderView"));
+    }
+
+    @Test
+    void getCurrentOrderTest() {
+        //when
+        String view = controller.getCurrentOrder(model);
+
+        //then
+        then(model).should(times(3)).addAttribute(anyString(), any());
+        assertThat("orderView").isEqualToIgnoringCase(view);
+    }
+
+    @Test
+    void getCurrentOrderControllerTest() throws Exception {
+        mockMvc.perform((get("/order")))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("order"))
+                .andExpect(model().attributeExists("sum"))
+                .andExpect(model().attributeExists("orderDetails"))
+                .andExpect(view().name("orderView"));
     }
 
     @Test
