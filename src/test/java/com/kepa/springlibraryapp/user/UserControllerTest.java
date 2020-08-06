@@ -126,7 +126,7 @@ class UserControllerTest {
 
 
     @Test
-    void singup() {
+    void singupTest() {
         //given
         Token token = new Token();
         token.setAppUser(user);
@@ -143,14 +143,79 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUser() {
+    void singupControllerTest() throws Exception {
+        mockMvc.perform(get("/token")
+                .param("value","not empty"))
+                .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    void deleteUserTest() {
+        //given
+        Long userId = 2L;
+
+        //when
+        String view = controller.deleteUser(userId,model);
+
+        //then
+        then(userService).should().delete(userId);
+        then(userService).should().findAll();
+        then(model).should().addAttribute(anyString(), any());
+        assertThat("redirect:/users").isEqualToIgnoringCase(view);
     }
 
     @Test
-    void getUser() {
+    void deleteUserControllerTest() throws Exception {
+        mockMvc.perform(get("/2/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("users"))
+                .andExpect(view().name("redirect:/users"));
+
     }
 
     @Test
-    void updateUser() {
+    void getUserTest() {
+        //given
+        Long userId = 2L;
+
+        //when
+        String view = controller.getUser(userId,model);
+
+        //then
+        then(userService).should().findById(userId);
+        then(model).should().addAttribute(anyString(), any());
+        assertThat("panel/user-edit").isEqualToIgnoringCase(view);
+    }
+
+    @Test
+    void getUserControllerTest() throws Exception {
+        mockMvc.perform(get("/user-edit")
+                .param("userId", String.valueOf(1L)))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("userModel"))
+                .andExpect(view().name("panel/user-edit"));
+    }
+
+    @Test
+    void updateUserValidControllerTest() throws Exception {
+        mockMvc.perform(post("/user-edit")
+                .param("firstname","John")
+                .param("lastname","Doe")
+                .param("email","mail@ma.com")
+                .param("password","not empty")
+                .param("userId","2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("users"))
+                .andExpect(view().name("redirect:/users"));
+    }
+    @Test
+    void updateUserNotValidControllerTest() throws Exception {
+        mockMvc.perform(post("/user-edit")
+                .param("firstname","John")
+                .param("lastname","Doe")
+                .param("email","mail")
+                .param("password","not empty")
+                .param("userId","2"))
+                .andExpect(status().is4xxClientError());
     }
 }
