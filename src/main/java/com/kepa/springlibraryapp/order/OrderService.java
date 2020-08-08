@@ -35,7 +35,6 @@ public class OrderService {
     }
 
     public Optional<Book> addBookToOrder(Long bookId) {
-
         Optional<Book> book = bookRepository.findById(bookId);
         book.ifPresent(clientOrder::add);
 
@@ -44,7 +43,8 @@ public class OrderService {
 
     public void deleteBookFromOrder(Long bookIndex) {
         int index = bookIndex.intValue();
-        clientOrder.getOrder().getBooks().remove(index);
+        Order order = clientOrder.getOrder();
+        order.getBooks().remove(index);
     }
 
     public void proceedOrder(OrderDetails orderDetails, Authentication authentication) {
@@ -74,8 +74,8 @@ public class OrderService {
     }
 
     public double sumOrderCost(){
-        return clientOrder
-                .getOrder()
+        Order order = clientOrder.getOrder();
+        return order
                 .getBooks().stream()
                 .mapToDouble(Book::getPrice)
                 .sum();

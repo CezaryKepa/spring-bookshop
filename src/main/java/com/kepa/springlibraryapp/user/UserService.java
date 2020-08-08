@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService {
-    private static final String DEFAULT_ROLE = "ROLE_USER";
+    public static final String DEFAULT_ROLE = "ROLE_USER";
     private static final String APP_URL = "http://51.68.142.7:8080/";
     private UserRepository userRepository;
     private TokenRepository tokenRepository;
@@ -30,32 +30,17 @@ public class UserService {
     private MailService mailService;
 
     @Autowired
-    public UserService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       TokenRepository tokenRepository,
+                       UserRoleRepository roleRepository,
+                       OrderRepository orderRepository,
+                       PasswordEncoder passwordEncoder,
+                       MailService mailService) {
         this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setRoleRepository(UserRoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
-
-    @Autowired
-    public void setOrderRepository(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-
-    @Autowired
-    public void setTokenRepository(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
-    }
-
-    @Autowired
-    public void setMailService(MailService mailService) {
+        this.roleRepository = roleRepository;
+        this.orderRepository = orderRepository;
+        this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
     }
 
